@@ -1,0 +1,21 @@
+{
+    "name": "mrzkit/laravel-extension-eloquent",
+    "description": "Laravel Eloquent 扩展",
+    "type": "library",
+    "require": {
+        "laravel/laravel": ">=8.5"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Mrzkit\\LaravelExtensionEloquent\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "zhushijie.zhu",
+            "email": "562591971@qq.com"
+        }
+    ],
+    "minimum-stability": "dev"
+}
