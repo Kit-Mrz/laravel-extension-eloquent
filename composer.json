@@ -3,7 +3,7 @@
     "description": "Laravel Eloquent 扩展",
     "type": "library",
     "require": {
-        "laravel/laravel": ">=8.5"
+        "laravel/framework": "^8.0"
     },
     "license": "MIT",
     "autoload": {
