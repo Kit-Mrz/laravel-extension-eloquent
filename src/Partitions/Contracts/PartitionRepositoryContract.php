@@ -2,13 +2,18 @@
 
 namespace Mrzkit\LaravelExtensionEloquent\Partitions\Contracts;
 
+use Illuminate\Database\Eloquent\Model;
+
+/**
+ * 分表增删改查数据仓库契约
+ */
 interface PartitionRepositoryContract
 {
     /**
      * @desc 增
      * @param int $partitionFactor 分表因子
      * @param array $data 新增数据
-     * @return mixed
+     * @return Model
      */
     public function partitionCreate(int $partitionFactor, array $data);
 
@@ -24,7 +29,7 @@ interface PartitionRepositoryContract
      * @param int $partitionFactor 分表因子
      * @param int $id 主键
      * @param array $data 更新的数据
-     * @return mixed
+     * @return bool|null
      */
     public function partitionUpdate(int $partitionFactor, int $id, array $data);
 
@@ -32,10 +37,9 @@ interface PartitionRepositoryContract
      * @desc 删
      * @param int $partitionFactor 分表因子
      * @param int $id 主键
-     * @return mixed
+     * @return bool|null
      */
     public function partitionDelete(int $partitionFactor, int $id);
-
 
     /**
      * @desc 改(改软删)
@@ -53,7 +57,7 @@ interface PartitionRepositoryContract
      * @param array $fields 查询字段
      * @return mixed
      */
-    public function partitionDetail(int $partitionFactor, int $id, array $fields = []);
+    public function partitionDetail(int $partitionFactor, int $id, array $fields = ['id']);
 
     /**
      * @desc 详情(查软删)
@@ -62,13 +66,22 @@ interface PartitionRepositoryContract
      * @param array $fields 查询字段
      * @return mixed
      */
-    public function partitionDetailWithTrashed(int $partitionFactor, int $id, array $fields = []);
+    public function partitionDetailWithTrashed(int $partitionFactor, int $id, array $fields = ['id']);
 
     /**
-     * @desc 分表批量添加
+     * @desc 快速批量创建
      * @param int $partitionFactor 分表因子
-     * @param array $data
+     * @param array $data 数据
      * @return bool
      */
-    public function partitionBatchCreate(int $partitionFactor, array $data);
+    public function partitionFastBatchCreate(int $partitionFactor, array $data) : bool;
+
+    /**
+     * @desc 安全批量创建
+     * @param int $partitionFactor 分表因子
+     * @param array $data 数据
+     * @return array
+     */
+    public function partitionSafeBatchCreate(int $partitionFactor, array $data) : array;
+
 }

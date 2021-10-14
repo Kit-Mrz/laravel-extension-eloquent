@@ -4,6 +4,9 @@ namespace Mrzkit\LaravelExtensionEloquent\Partitions\Contracts;
 
 use Mrzkit\LaravelExtensionEloquent\Partitions\Partition;
 
+/**
+ * 分表模型
+ */
 interface PartitionContract
 {
     /**

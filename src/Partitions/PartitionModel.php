@@ -5,6 +5,9 @@ namespace Mrzkit\LaravelExtensionEloquent\Partitions;
 use Mrzkit\LaravelExtensionEloquent\Partitions\Contracts\PartitionContract;
 use Mrzkit\LaravelExtensionEloquent\EloquentModel;
 
+/**
+ * 分表模型
+ */
 abstract class PartitionModel extends EloquentModel implements PartitionContract
 {
     /**

@@ -4,6 +4,9 @@ namespace Mrzkit\LaravelExtensionEloquent\Partitions;
 
 use RuntimeException;
 
+/**
+ * 分表类
+ */
 class Partition
 {
     /**

@@ -1,6 +1,9 @@
 <?php
 namespace Mrzkit\LaravelExtensionEloquent\Contracts;
 
+/**
+ * 模型契约
+ */
 interface ModelContract
 {
     /**

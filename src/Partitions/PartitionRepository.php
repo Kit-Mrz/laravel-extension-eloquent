@@ -2,12 +2,13 @@
 
 namespace Mrzkit\LaravelExtensionEloquent\Partitions;
 
+use Closure;
 use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Support\Facades\DB;
 use Mrzkit\LaravelExtensionEloquent\Contracts\ModelContract;
 use Mrzkit\LaravelExtensionEloquent\Partitions\Contracts\PartitionRepositoryContract;
 
-abstract class PartitionRepository implements ModelContract, PartitionRepositoryContract
+class PartitionRepository implements ModelContract, PartitionRepositoryContract
 {
     /**
      * @var PartitionModel 模型
@@ -45,7 +46,9 @@ abstract class PartitionRepository implements ModelContract, PartitionRepository
     {
         $model = clone $this->getModel()->partition($partitionFactor);
 
-        $model->fill($data)->save();
+        if ( !$model->fill($data)->save()) {
+            throw new PartitionException('Create data fail.');
+        }
 
         return $model;
     }
@@ -55,13 +58,24 @@ abstract class PartitionRepository implements ModelContract, PartitionRepository
      * @param int $partitionFactor 分表因子
      * @param int $page 页码
      * @param int $perPage 每页数
+     * @param array|string[] $fields 查询字段
+     * @param Closure|null $before 前置
+     * @param Closure|null $after 后置
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
      */
-    public function partitionRetrieve(int $partitionFactor, int $page = 1, int $perPage = 20)
+    public function partitionRetrieve(int $partitionFactor, int $page = 1, int $perPage = 20, array $fields = ['*'], Closure $before = null, Closure $after = null)
     {
         $query = $this->getModel()->partition($partitionFactor)->newQuery();
 
-        $rows = $query->orderByDesc($this->getModel()->getKeyName())->paginate($perPage, ['*'], 'page', $page);
+        if ( !is_null($before)) {
+            $before($query);
+        }
+
+        $rows = $query->orderByDesc($this->getModel()->getKeyName())->paginate($perPage, $fields, 'page', $page);
+
+        if ( !is_null($after)) {
+            $after($query);
+        }
 
         return $rows;
     }
@@ -71,13 +85,21 @@ abstract class PartitionRepository implements ModelContract, PartitionRepository
      * @param int $partitionFactor 分表因子
      * @param int $id 主键
      * @param array $data 更新的数据
-     * @return int|mixed
+     * @return bool|null
      */
     public function partitionUpdate(int $partitionFactor, int $id, array $data)
     {
-        $query = $this->getModel()->partition($partitionFactor)->newQuery();
+        $obj = $this->partitionDetail($partitionFactor, $id);
 
-        $updated = $query->where($this->getModel()->getKeyName(), $id)->update($data);
+        if (is_null($obj)) {
+            return null;
+        }
+
+        $updated = $obj->update($data);
+
+        if ( !$updated) {
+            throw new PartitionException('Update data fail.');
+        }
 
         return $updated;
     }
@@ -86,13 +108,21 @@ abstract class PartitionRepository implements ModelContract, PartitionRepository
      * @desc 删
      * @param int $partitionFactor 分表因子
      * @param int $id 主键
-     * @return mixed
+     * @return bool|null
      */
     public function partitionDelete(int $partitionFactor, int $id)
     {
-        $query = $this->getModel()->partition($partitionFactor)->newQuery();
+        $obj = $this->partitionDetail($partitionFactor, $id);
 
-        $deleted = $query->where($this->getModel()->getKeyName(), $id)->delete();
+        if (is_null($obj)) {
+            return null;
+        }
+
+        $deleted = $obj->delete();
+
+        if ( !$deleted) {
+            throw new PartitionException('Delete data fail.');
+        }
 
         return $deleted;
     }
@@ -106,9 +136,17 @@ abstract class PartitionRepository implements ModelContract, PartitionRepository
      */
     public function partitionUpdateWithTrashed(int $partitionFactor, int $id, array $data)
     {
-        $query = $this->getModel()->partition($partitionFactor)->newQuery();
+        $obj = $this->partitionDetailWithTrashed($partitionFactor, $id);
 
-        $updated = $query->where($this->getModel()->getKeyName(), $id)->withTrashed()->update($data);
+        if (is_null($obj)) {
+            return null;
+        }
+
+        $updated = $obj->update($data);
+
+        if ( !$updated) {
+            throw new PartitionException('Update data fail.');
+        }
 
         return $updated;
     }
@@ -120,7 +158,7 @@ abstract class PartitionRepository implements ModelContract, PartitionRepository
      * @param array $fields 查询字段
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|mixed|object|null
      */
-    public function partitionDetail(int $partitionFactor, int $id, array $fields = [])
+    public function partitionDetail(int $partitionFactor, int $id, array $fields = ['id'])
     {
         $query = $this->getModel()->partition($partitionFactor)->newQuery();
 
@@ -136,7 +174,7 @@ abstract class PartitionRepository implements ModelContract, PartitionRepository
      * @param array $fields 查询字段
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|mixed|object|null
      */
-    public function partitionDetailWithTrashed(int $partitionFactor, int $id, array $fields = [])
+    public function partitionDetailWithTrashed(int $partitionFactor, int $id, array $fields = ['id'])
     {
         $query = $this->getModel()->partition($partitionFactor)->newQuery();
 
@@ -146,12 +184,12 @@ abstract class PartitionRepository implements ModelContract, PartitionRepository
     }
 
     /**
-     * @desc 分表批量添加
+     * @desc 快速批量添加
      * @param int $partitionFactor 分表因子
-     * @param array $data
+     * @param array $data 数据
      * @return bool
      */
-    public function partitionBatchCreate(int $partitionFactor, array $data)
+    public function partitionFastBatchCreate(int $partitionFactor, array $data) : bool
     {
         $model = $this->getModel()->partition($partitionFactor);
 
@@ -184,5 +222,42 @@ abstract class PartitionRepository implements ModelContract, PartitionRepository
         }
 
         return $inserted;
+    }
+
+    /**
+     * @desc 安全批量添加
+     * @param int $partitionFactor 分表因子
+     * @param array $storeData 数据
+     * @return array
+     */
+    public function partitionSafeBatchCreate(int $partitionFactor, array $storeData) : array
+    {
+        $list = [];
+
+        // 事务
+        DB::beginTransaction();
+
+        try {
+            foreach ($storeData as $data) {
+                $model = clone $this->getModel()->partition($partitionFactor);
+
+                if ( !$model->fill($data)->save()) {
+                    $encode = json_encode($data);
+                    throw new PartitionException('Delete data fail.' . $encode);
+                }
+
+                $list[] = $model;
+            }
+
+            // 提交
+            DB::commit();
+
+            return $list;
+        } catch (PartitionException $e) {
+            // 回滚
+            DB::rollBack();
+
+            throw $e;
+        }
     }
 }
