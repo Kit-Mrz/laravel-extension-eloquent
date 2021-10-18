@@ -2,6 +2,7 @@
 
 namespace Mrzkit\LaravelExtensionEloquent\Partitions\Contracts;
 
+use Closure;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -51,22 +52,42 @@ interface PartitionRepositoryContract
     public function partitionUpdateWithTrashed(int $partitionFactor, int $id, array $data);
 
     /**
-     * @desc 详情
+     * @desc 信息
      * @param int $partitionFactor 分表因子
      * @param int $id 主键
      * @param array $fields 查询字段
      * @return mixed
      */
-    public function partitionDetail(int $partitionFactor, int $id, array $fields = ['id']);
+    public function partitionInfo(int $partitionFactor, int $id, array $fields = ['id']);
+
+    /**
+     * @desc 信息(查软删)
+     * @param int $partitionFactor 分表因子
+     * @param int $id 主键
+     * @param array $fields 查询字段
+     * @return mixed
+     */
+    public function partitionInfoWithTrashed(int $partitionFactor, int $id, array $fields = ['id']);
+
+    /**
+     * @desc 详情
+     * @param int $partitionFactor 分表因子
+     * @param int $id 主键
+     * @param array|string[] $fields 查询字段
+     * @param Closure|null $before 查询前处理
+     * @return mixed
+     */
+    public function partitionDetail(int $partitionFactor, int $id, array $fields = ['id'], Closure $before = null);
 
     /**
      * @desc 详情(查软删)
      * @param int $partitionFactor 分表因子
      * @param int $id 主键
-     * @param array $fields 查询字段
+     * @param array|string[] $fields 查询字段
+     * @param Closure|null $before 查询前处理
      * @return mixed
      */
-    public function partitionDetailWithTrashed(int $partitionFactor, int $id, array $fields = ['id']);
+    public function partitionDetailWithTrashed(int $partitionFactor, int $id, array $fields = ['id'], Closure $before = null);
 
     /**
      * @desc 快速批量创建
@@ -83,5 +104,4 @@ interface PartitionRepositoryContract
      * @return array
      */
     public function partitionSafeBatchCreate(int $partitionFactor, array $data) : array;
-
 }

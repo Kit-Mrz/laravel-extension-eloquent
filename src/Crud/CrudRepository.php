@@ -147,12 +147,12 @@ abstract class CrudRepository implements ModelContract, CrudRepositoryContract
     }
 
     /**
-     * @desc 详情
-     * @param int $id 主键
-     * @param array|string[] $fields 查询字段
+     * @desc 信息
+     * @param int $id
+     * @param array|string[] $fields
      * @return \Illuminate\Database\Eloquent\Builder|Model|mixed|object|null
      */
-    public function detail(int $id, array $fields = ['id'])
+    public function info(int $id, array $fields = ['id'])
     {
         $query = $this->getModel()->newQuery();
 
@@ -162,14 +162,54 @@ abstract class CrudRepository implements ModelContract, CrudRepositoryContract
     }
 
     /**
-     * @desc 详情(查软删)
-     * @param int $id 主键
-     * @param array $fields 查询字段
-     * @return \Illuminate\Database\Eloquent\Builder|Model|mixed|object|null
+     * @desc 信息(查软删)
+     * @param int $id
+     * @param array|string[] $fields
+     * @return mixed
      */
-    public function detailWithTrashed(int $id, array $fields = ['id'])
+    public function infoWithTrashed(int $id, array $fields = ['id'])
     {
         $query = $this->getModel()->newQuery();
+
+        $row = $query->select($fields)->where($this->getModel()->getKeyName(), $id)->withTrashed()->first();
+
+        return $row;
+    }
+
+    /**
+     * @desc 详情
+     * @param int $id 主键
+     * @param array|string[] $fields 查询字段
+     * @param Closure|null $before 查询前处理
+     * @return \Illuminate\Database\Eloquent\Builder|Model|mixed|object|null
+     */
+    public function detail(int $id, array $fields = ['id'], Closure $before = null)
+    {
+        $query = $this->getModel()->newQuery();
+
+        if ( !is_null($before)) {
+            $before($query);
+        }
+
+        $row = $query->select($fields)->where($this->getModel()->getKeyName(), $id)->first();
+
+        return $row;
+    }
+
+    /**
+     * @desc 详情(查软删)
+     * @param int $id 主键
+     * @param array|string[] $fields 查询字段
+     * @param Closure|null $before 查询前处理
+     * @return \Illuminate\Database\Eloquent\Builder|Model|mixed|object|null
+     */
+    public function detailWithTrashed(int $id, array $fields = ['id'], Closure $before = null)
+    {
+        $query = $this->getModel()->newQuery();
+
+        if ( !is_null($before)) {
+            $before($query);
+        }
 
         $row = $query->select($fields)->where($this->getModel()->getKeyName(), $id)->withTrashed()->first();
 

@@ -3,6 +3,7 @@
 namespace Mrzkit\LaravelExtensionEloquent\Crud\Contracts;
 
 use Illuminate\Database\Eloquent\Model;
+use Closure;
 
 /**
  * 基本增删改查数据仓库契约
@@ -47,19 +48,37 @@ interface CrudRepositoryContract
 
     /**
      * @desc 详情
-     * @param int $id
-     * @param array $fields 查询字段
+     * @param int $id 主键
+     * @param array|string[] $fields 查询字段
+     * @param Closure|null $before 查询前处理
      * @return mixed
      */
-    public function detail(int $id, array $fields = ['id']);
+    public function detail(int $id, array $fields = ['id'], Closure $before = null);
 
     /**
      * @desc 详情(查软删)
-     * @param int $id
+     * @param int $id 主键
+     * @param array|string[] $fields 查询字段
+     * @param Closure|null $before 查询前处理
+     * @return mixed
+     */
+    public function detailWithTrashed(int $id, array $fields = ['id'], Closure $before = null);
+
+    /**
+     * @desc 信息
+     * @param int $id 主键
      * @param array $fields 查询字段
      * @return mixed
      */
-    public function detailWithTrashed(int $id, array $fields = ['id']);
+    public function info(int $id, array $fields = ['id']);
+
+    /**
+     * @desc 信息(查软删)
+     * @param int $id 主键
+     * @param array $fields 查询字段
+     * @return mixed
+     */
+    public function infoWithTrashed(int $id, array $fields = ['id']);
 
     /**
      * @desc 快速批量创建

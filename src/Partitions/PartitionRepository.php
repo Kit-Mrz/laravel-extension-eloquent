@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Mrzkit\LaravelExtensionEloquent\Contracts\ModelContract;
 use Mrzkit\LaravelExtensionEloquent\Partitions\Contracts\PartitionRepositoryContract;
 
-class PartitionRepository implements ModelContract, PartitionRepositoryContract
+abstract class PartitionRepository implements ModelContract, PartitionRepositoryContract
 {
     /**
      * @var PartitionModel 模型
@@ -152,15 +152,52 @@ class PartitionRepository implements ModelContract, PartitionRepositoryContract
     }
 
     /**
-     * @desc 详情
+     * @desc 信息
      * @param int $partitionFactor 分表因子
      * @param int $id 主键
      * @param array $fields 查询字段
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|mixed|object|null
      */
-    public function partitionDetail(int $partitionFactor, int $id, array $fields = ['id'])
+    public function partitionInfo(int $partitionFactor, int $id, array $fields = ['id'])
     {
         $query = $this->getModel()->partition($partitionFactor)->newQuery();
+
+        $row = $query->select($fields)->where($this->getModel()->getKeyName(), $id)->first();
+
+        return $row;
+    }
+
+    /**
+     * @desc 信息(查软删)
+     * @param int $partitionFactor 分表因子
+     * @param int $id 主键
+     * @param array $fields 查询字段
+     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|mixed|object|null
+     */
+    public function partitionInfoWithTrashed(int $partitionFactor, int $id, array $fields = ['id'])
+    {
+        $query = $this->getModel()->partition($partitionFactor)->newQuery();
+
+        $row = $query->select($fields)->where($this->getModel()->getKeyName(), $id)->withTrashed()->first();
+
+        return $row;
+    }
+
+    /**
+     * @desc 详情
+     * @param int $partitionFactor 分表因子
+     * @param int $id 主键
+     * @param array|string[] $fields 查询字段
+     * @param Closure|null $before 查询前处理
+     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|mixed|object|null
+     */
+    public function partitionDetail(int $partitionFactor, int $id, array $fields = ['id'], Closure $before = null)
+    {
+        $query = $this->getModel()->partition($partitionFactor)->newQuery();
+
+        if ( !is_null($before)) {
+            $before($query);
+        }
 
         $row = $query->select($fields)->where($this->getModel()->getKeyName(), $id)->first();
 
@@ -171,12 +208,17 @@ class PartitionRepository implements ModelContract, PartitionRepositoryContract
      * @desc 详情(查软删)
      * @param int $partitionFactor 分表因子
      * @param int $id 主键
-     * @param array $fields 查询字段
+     * @param array|string[] $fields 查询字段
+     * @param Closure|null $before 查询前处理
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|mixed|object|null
      */
-    public function partitionDetailWithTrashed(int $partitionFactor, int $id, array $fields = ['id'])
+    public function partitionDetailWithTrashed(int $partitionFactor, int $id, array $fields = ['id'], Closure $before = null)
     {
         $query = $this->getModel()->partition($partitionFactor)->newQuery();
+
+        if ( !is_null($before)) {
+            $before($query);
+        }
 
         $row = $query->select($fields)->where($this->getModel()->getKeyName(), $id)->withTrashed()->first();
 
