@@ -3,6 +3,7 @@
 namespace Mrzkit\LaravelExtensionEloquent\Partitions\Contracts;
 
 use Closure;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -52,24 +53,6 @@ interface PartitionRepositoryContract
     public function partitionUpdateWithTrashed(int $partitionFactor, int $id, array $data);
 
     /**
-     * @desc 信息
-     * @param int $partitionFactor 分表因子
-     * @param int $id 主键
-     * @param array $fields 查询字段
-     * @return mixed
-     */
-    public function partitionInfo(int $partitionFactor, int $id, array $fields = ['id']);
-
-    /**
-     * @desc 信息(查软删)
-     * @param int $partitionFactor 分表因子
-     * @param int $id 主键
-     * @param array $fields 查询字段
-     * @return mixed
-     */
-    public function partitionInfoWithTrashed(int $partitionFactor, int $id, array $fields = ['id']);
-
-    /**
      * @desc 详情
      * @param int $partitionFactor 分表因子
      * @param int $id 主键
@@ -104,4 +87,18 @@ interface PartitionRepositoryContract
      * @return array
      */
     public function partitionSafeBatchCreate(int $partitionFactor, array $data) : array;
+
+    /**
+     * @desc 关联配置
+     * @return array
+     */
+    public function relationConfig() : array;
+
+    /**
+     * @desc 关联解析器
+     * @param Builder $query
+     * @param array $relations 关联配置
+     * @return mixed
+     */
+    public function relationResolver(Builder $query, array $relations);
 }

@@ -3,9 +3,11 @@
 namespace Mrzkit\LaravelExtensionEloquent\Crud;
 
 use Closure;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
 use Mrzkit\LaravelExtensionEloquent\Contracts\ModelContract;
 use Mrzkit\LaravelExtensionEloquent\Crud\Contracts\CrudRepositoryContract;
 
@@ -147,36 +149,6 @@ abstract class CrudRepository implements ModelContract, CrudRepositoryContract
     }
 
     /**
-     * @desc 信息
-     * @param int $id
-     * @param array|string[] $fields
-     * @return \Illuminate\Database\Eloquent\Builder|Model|mixed|object|null
-     */
-    public function info(int $id, array $fields = ['id'])
-    {
-        $query = $this->getModel()->newQuery();
-
-        $row = $query->select($fields)->where($this->getModel()->getKeyName(), $id)->first();
-
-        return $row;
-    }
-
-    /**
-     * @desc 信息(查软删)
-     * @param int $id
-     * @param array|string[] $fields
-     * @return mixed
-     */
-    public function infoWithTrashed(int $id, array $fields = ['id'])
-    {
-        $query = $this->getModel()->newQuery();
-
-        $row = $query->select($fields)->where($this->getModel()->getKeyName(), $id)->withTrashed()->first();
-
-        return $row;
-    }
-
-    /**
      * @desc 详情
      * @param int $id 主键
      * @param array|string[] $fields 查询字段
@@ -290,6 +262,58 @@ abstract class CrudRepository implements ModelContract, CrudRepositoryContract
 
             throw $e;
         }
+    }
+
+    /**
+     * @desc 关联配置
+     * @return array
+     */
+    abstract public function relationConfig() : array;
+
+    /**
+     * @desc 关联解析器
+     * @param Builder $query
+     * @param array $relations 关联配置
+     * @return Builder
+     */
+    public function relationResolver(Builder $query, array $relations)
+    {
+        // 读取仓库的关联配置
+        $relationConfigs = $this->relationConfig();
+
+        $filterConfigs = [];
+
+        foreach ($relations as $relationName => $relationParam) {
+            // 抹掉左边的字符
+            $name = ltrim($relationName, 'with_');
+
+            // 检测是否已经配置
+            if ( !isset($relationConfigs[$name])) {
+                throw new InvalidArgumentException("没有此关联配置: {$name}");
+            }
+
+            if (is_bool($relationParam)) {
+                if ($relationParam && isset($relationConfigs[$name])) {
+                    // 获取配置
+                    $filterConfigs[$name] = $relationConfigs[$name]([]);
+                }
+            } else if (is_array($relationParam)) {
+                if ( !empty($relationParam)) {
+                    // 获取配置
+                    $filterConfigs[$name] = $relationConfigs[$name](
+                        $relationParam
+                    );
+                }
+            } else {
+                throw new InvalidArgumentException('关联参数只支持布尔类型和数组类型:' . gettype($relationParam));
+            }
+        }
+
+        if (empty( !$filterConfigs)) {
+            $query->with($filterConfigs);
+        }
+
+        return $query;
     }
 }
 
