@@ -1,6 +1,6 @@
 <?php
 
-namespace Mrzkit\LaravelExtensionEloquent\Partitions;
+namespace Mrzkit\LaravelExtensionEloquent;
 
 use RuntimeException;
 

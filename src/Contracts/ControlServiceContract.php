@@ -7,15 +7,39 @@ namespace Mrzkit\LaravelExtensionEloquent\Contracts;
  */
 interface ControlServiceContract
 {
+    /**
+     * @desc 列表
+     * @param array $params
+     * @return mixed
+     */
     public function index(array $params);
 
+    /**
+     * @desc 保存
+     * @param array $params
+     * @return mixed
+     */
     public function store(array $params);
 
+    /**
+     * @desc 信息
+     * @param int $id
+     * @return mixed
+     */
     public function show(int $id);
 
+    /**
+     * @desc 更新
+     * @param int $id
+     * @param array $params
+     * @return mixed
+     */
     public function update(int $id, array $params);
 
+    /**
+     * @desc 删除
+     * @param int $id
+     * @return mixed
+     */
     public function destroy(int $id);
-
-    public function detail(int $id, array $fields = ['id']);
 }
