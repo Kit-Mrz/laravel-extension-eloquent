@@ -6,6 +6,14 @@ use Illuminate\Database\Eloquent\Builder;
 
 interface ResolverContract
 {
+    /*
+    * return [
+    *   'baserUsers' => (function ($where) {
+    *        return function (HasOne $query) use ($where) {
+    *      };
+    *   }),
+    * ];
+    */
     /**
      * @desc 关联配置
      * @return array
@@ -20,6 +28,20 @@ interface ResolverContract
      */
     public function relationResolver(Builder $query, array $relations) : Builder;
 
+    /**
+     * return [
+     *     '-id' => [
+     *     'orderTable' => $orderTable,
+     *     'key'        => 'id',
+     *     'value'      => 'desc',
+     *   ],
+     *   '+id' => [
+     *     'orderTable' => $orderTable,
+     *     'key'        => 'id',
+     *     'value'      => 'asc',
+     *   ],
+     * ];
+     */
     /**
      * @desc 排序配置
      * @param string $orderTable 表名

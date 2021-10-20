@@ -73,8 +73,8 @@ abstract class CrudRepository implements ModelContract, RepositoryContract, Batc
         $conf = [
             'perPage'  => (int) ($paginateParams['perPage'] ?? 20),
             'columns'  => $fields,
-            'pageName' => (string) $paginateParams['pageName'] ?? 'page',
-            'page'     => (int) $paginateParams['page'] ?? 1,
+            'pageName' => (string) ($paginateParams['pageName'] ?? 'page'),
+            'page'     => (int) ($paginateParams['page'] ?? 1),
         ];
 
         $query = $this->getModel()->newQuery();
