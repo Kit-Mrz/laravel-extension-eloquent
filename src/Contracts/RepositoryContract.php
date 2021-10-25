@@ -16,7 +16,7 @@ interface RepositoryContract
      * @desc 查
      * @return mixed
      */
-    public function retrieve(array $fields = ['*'], array $relations = [], array $paginateParams = [], Closure $before = null, Closure $after = null);
+    public function retrieve(array $fields = ['*'], array $relations = [], array $paginateParams = [], array $orderConfig = [], Closure $before = null, Closure $after = null);
 
     /**
      * @desc 改

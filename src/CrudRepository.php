@@ -60,15 +60,16 @@ abstract class CrudRepository implements ModelContract, RepositoryContract, Batc
     }
 
     /**
-     * @desc
-     * @param array|string[] $fields
-     * @param array $relations
-     * @param array $paginateParams
-     * @param Closure|null $before
-     * @param Closure|null $after
+     * @desc 检索
+     * @param array|string[] $fields 查询字段
+     * @param array $relations 查询关联
+     * @param array $paginateParams 分页配置
+     * @param array $orderConfig 排序配置
+     * @param Closure|null $before 查询前处理
+     * @param Closure|null $after 查询后处理
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|mixed
      */
-    public function retrieve(array $fields = ['*'], array $relations = [], array $paginateParams = [], Closure $before = null, Closure $after = null)
+    public function retrieve(array $fields = ['*'], array $relations = [], array $paginateParams = [], array $orderConfig = [], Closure $before = null, Closure $after = null)
     {
         $conf = [
             'perPage'  => (int) ($paginateParams['perPage'] ?? 20),
@@ -89,9 +90,13 @@ abstract class CrudRepository implements ModelContract, RepositoryContract, Batc
             $query = $this->relationResolver($query, $relations);
         }
 
+        // 关联排序解析器
+        if ( !empty($orderConfig)) {
+            $query = $this->orderResolver($query, $orderConfig['orderKey'], $orderConfig['orderTable'] ?? '');
+        }
+
         // 排序和分页
-        $rows = $query->select($fields)->orderByDesc($this->getModel()->getKeyName())
-            ->paginate($conf['perPage'], ['*'], $conf['pageName'], $conf['page']);
+        $rows = $query->select($fields)->paginate($conf['perPage'], ['*'], $conf['pageName'], $conf['page']);
 
         if ( !is_null($after)) {
             $after($query);
