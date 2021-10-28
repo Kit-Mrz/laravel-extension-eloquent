@@ -28,7 +28,7 @@ trait ResolverTrait
 
         foreach ($relations as $relationName => $relationParam) {
             // 抹掉左边的字符
-            $name = ltrim($relationName, 'with_');
+            $name = substr($relationName, 5);
 
             // 检测是否已经配置
             if ( !isset($relationConfigs[$name])) {
