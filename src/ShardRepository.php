@@ -177,11 +177,16 @@ abstract class ShardRepository implements ModelContract, RepositoryContract, Bat
      * @param int $id
      * @param array|string[] $fields
      * @param array $relations
+     * @param Closure|null $before
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|mixed|object|null
      */
-    public function info(int $id, array $fields = ['id'], array $relations = [])
+    public function info(int $id, array $fields = ['id'], array $relations = [], Closure $before = null)
     {
         $query = $this->getModel()->sharding()->newQuery();
+
+        if ( !is_null($before)) {
+            $before($query);
+        }
 
         // 关联解析器
         if ( !empty($relations)) {
@@ -243,11 +248,16 @@ abstract class ShardRepository implements ModelContract, RepositoryContract, Bat
      * @param int $id
      * @param array|string[] $fields
      * @param array $relations
+     * @param Closure|null $before
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|mixed|object|null
      */
-    public function trashInfo(int $id, array $fields = ['id'], array $relations = [])
+    public function trashInfo(int $id, array $fields = ['id'], array $relations = [], Closure $before = null)
     {
         $query = $this->getModel()->sharding()->newQuery();
+
+        if ( !is_null($before)) {
+            $before($query);
+        }
 
         // 关联解析器
         if ( !empty($relations)) {

@@ -38,7 +38,8 @@ interface RepositoryContract
      * @param int $id
      * @param string[] $fields
      * @param string[] $relations
+     * @param Closure|null $before
      * @return mixed
      */
-    public function info(int $id, array $fields = ['id'], array $relations = ['with_' => true]);
+    public function info(int $id, array $fields = ['id'], array $relations = ['with_' => true], Closure $before = null);
 }

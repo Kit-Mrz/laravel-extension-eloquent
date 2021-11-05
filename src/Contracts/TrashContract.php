@@ -2,6 +2,8 @@
 
 namespace Mrzkit\LaravelExtensionEloquent\Contracts;
 
+use Closure;
+
 interface TrashContract
 {
     /**
@@ -24,7 +26,8 @@ interface TrashContract
      * @param int $id
      * @param array|string[] $fields
      * @param array $relations
+     * @param Closure|null $before
      * @return mixed
      */
-    public function trashInfo(int $id, array $fields = ['id'], array $relations = []);
+    public function trashInfo(int $id, array $fields = ['id'], array $relations = [], Closure $before = null);
 }
