@@ -10,9 +10,9 @@ abstract class ShardModel extends EloquentModel implements ShardingContract, Sha
     use Positioner;
 
     /**
-     * @var int 分表数
+     * @var int 最大分表数
      */
-    protected $shardCount = 64;
+    protected $shardMaxCount = 64;
 
     /**
      * @var \int[][] 分表配置
@@ -61,14 +61,23 @@ abstract class ShardModel extends EloquentModel implements ShardingContract, Sha
     ];
 
     /**
-     * @desc 获取分表数
-     * @return int $this->shardCount
+     * @desc 获取最大分表数
+     * @return int $this->shardMaxCount
      */
-    abstract public function getShardCount() : int;
+    abstract public function getShardMaxCount() : int;
 
     /**
      * @desc 获取分表配置
      * @return array $this->shardConfig
      */
     abstract public function getShardConfig() : array;
+
+    /**
+     * @desc 获取当前分表数
+     * @return int
+     */
+    public function getShardCount() : int
+    {
+        return count($this->getShardConfig());
+    }
 }

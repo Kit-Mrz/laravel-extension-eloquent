@@ -22,20 +22,20 @@ class Partition
     /**
      * @var int 分表数
      */
-    protected $partitionCount = 0;
+    protected $partitionMaxCount = 0;
 
     /**
      * @desc 设置分表数
-     * @param int $partitionCount
+     * @param int $partitionMaxCount
      * @return $this
      */
-    public function setPartitionCount(int $partitionCount)
+    public function setPartitionMaxCount(int $partitionMaxCount)
     {
-        if ($partitionCount < 1) {
+        if ($partitionMaxCount < 1) {
             throw new RuntimeException('请设置正确的分表数，值必须大于0!');
         }
 
-        $this->partitionCount = $partitionCount;
+        $this->partitionMaxCount = $partitionMaxCount;
 
         return $this;
     }
@@ -44,13 +44,13 @@ class Partition
      * @desc 获取分表数
      * @return int
      */
-    public function getPartitionCount() : int
+    public function getPartitionMaxCount() : int
     {
-        if ($this->partitionCount < 1) {
+        if ($this->partitionMaxCount < 1) {
             throw new RuntimeException('请设置正确的分表数，值必须大于0!');
         }
 
-        return $this->partitionCount;
+        return $this->partitionMaxCount;
     }
 
     /**
@@ -142,7 +142,7 @@ class Partition
             }
         }
 
-        if ($partition < 1 || $partition > $this->getPartitionCount()) {
+        if ($partition < 1 || $partition > $this->getPartitionMaxCount()) {
             throw new RuntimeException('分表计算错误，请检查分表配置!');
         }
 
@@ -155,11 +155,11 @@ class Partition
      */
     public function calculateFactor()
     {
-        $partitionCount = $this->getPartitionCount();
+        $partitionMaxCount = $this->getPartitionMaxCount();
 
         $partitionFactor = $this->getPartitionFactor();
 
-        $pos = $partitionFactor % $partitionCount;
+        $pos = $partitionFactor % $partitionMaxCount;
 
         return $pos;
     }

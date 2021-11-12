@@ -30,13 +30,13 @@ trait Positioner
      */
     public function position(int $id)
     {
-        $shardCount = $this->getShardCount();
+        $shardMaxCount = $this->getShardMaxCount();
 
         $shardConfig = $this->getShardConfig();
 
         $sharding = $this->getShardingInstance();
 
-        $location = $sharding->setPartitionCount($shardCount)->setPartitionFactor($id)
+        $location = $sharding->setPartitionMaxCount($shardMaxCount)->setPartitionFactor($id)
             ->setPartitionConfig($shardConfig)->calculatePartition();
 
         return $location;
