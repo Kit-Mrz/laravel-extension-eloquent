@@ -96,8 +96,8 @@ abstract class ShardRepository implements ModelContract, RepositoryContract, Bat
         $conf = [
             'perPage'  => (int) ($paginateParams['perPage'] ?? 20),
             'columns'  => $fields,
-            'pageName' => (string) $paginateParams['pageName'] ?? 'page',
-            'page'     => (int) $paginateParams['page'] ?? 1,
+            'pageName' => (string) ($paginateParams['pageName'] ?? 'page'),
+            'page'     => (int) ($paginateParams['page'] ?? 1),
         ];
 
         $query = $this->getModel()->sharding()->newQuery();
