@@ -95,7 +95,7 @@ trait Positioner
 
         $factor = $this->factor;
 
-        $this->factor = null;
+        //$this->factor = null;
 
         return $factor;
     }
