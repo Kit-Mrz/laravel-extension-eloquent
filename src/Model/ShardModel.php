@@ -80,4 +80,76 @@ abstract class ShardModel extends EloquentModel implements ShardingContract, Sha
     {
         return count($this->getShardConfig());
     }
+
+    /**
+     * @desc 匹配分区因子
+     * @return int
+     */
+    public function getMatchFactor() : int
+    {
+        $factor = 0;
+
+        if (preg_match('/_(\d+)$/', $this->getTable(), $matches)) {
+            if (isset($matches[1])) {
+                $factor = (int) $matches[1];
+                $factor = $factor - 1;
+            }
+        }
+
+        return $factor;
+    }
+
+    /**
+     * Define a one-to-many relationship.
+     *
+     * @param string $related
+     * @param string|null $foreignKey
+     * @param string|null $localKey
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function hasMany($related, $foreignKey = null, $localKey = null)
+    {
+        /** @var ShardModel $instance */
+        $instance = $this->newRelatedInstance($related);
+
+        $factor = $this->getMatchFactor();
+
+        if ($factor != 0) {
+            $instance->setFactor($factor)->sharding();
+        }
+
+        $foreignKey = $foreignKey ? : $this->getForeignKey();
+
+        $localKey = $localKey ? : $this->getKeyName();
+
+        return $this->newHasMany(
+            $instance->newQuery(), $this, $instance->getTable() . '.' . $foreignKey, $localKey
+        );
+    }
+
+    /**
+     * Define a one-to-one relationship.
+     *
+     * @param string $related
+     * @param string|null $foreignKey
+     * @param string|null $localKey
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function hasOne($related, $foreignKey = null, $localKey = null)
+    {
+        /** @var ShardModel $instance */
+        $instance = $this->newRelatedInstance($related);
+
+        $factor = $this->getMatchFactor();
+
+        if ($factor != 0) {
+            $instance->setFactor($factor)->sharding();
+        }
+
+        $foreignKey = $foreignKey ? : $this->getForeignKey();
+
+        $localKey = $localKey ? : $this->getKeyName();
+
+        return $this->newHasOne($instance->newQuery(), $this, $instance->getTable() . '.' . $foreignKey, $localKey);
+    }
 }
