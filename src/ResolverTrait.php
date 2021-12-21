@@ -21,34 +21,57 @@ trait ResolverTrait
      */
     public function relationResolver(Builder $query, array $relations) : Builder
     {
-        // 读取仓库的关联配置
         $relationConfigs = $this->relationConfig();
 
         $filterConfigs = [];
 
+        $nameSets = [];
+
         foreach ($relations as $relationName => $relationParam) {
-            // 抹掉左边的字符
+            //
             $name = substr($relationName, 5);
 
-            // 检测是否已经配置
             if ( !isset($relationConfigs[$name])) {
                 throw new InvalidArgumentException("没有此关联配置: {$name}");
             }
 
-            if (is_bool($relationParam)) {
-                if ($relationParam && isset($relationConfigs[$name])) {
-                    // 获取配置
-                    $filterConfigs[$name] = $relationConfigs[$name]([]);
+            if ($relationConfigs[$name] instanceof \Closure) {
+                // Old
+                $relationConfig = $relationConfigs[$name];
+
+                if (isset($nameSets[$name])) {
+                    throw new InvalidArgumentException("关联配置引用重复: {$name}");
+                } else {
+                    $nameSets[$name] = true;
                 }
-            } else if (is_array($relationParam)) {
-                if ( !empty($relationParam)) {
-                    // 获取配置
-                    $filterConfigs[$name] = $relationConfigs[$name](
-                        $relationParam
-                    );
+            } else if (is_array($relationConfigs[$name]) && isset($relationConfigs[$name]['relation']) && isset($relationConfigs[$name]['call'])) {
+                // New
+                if ($relationConfigs[$name]['call'] instanceof \Closure) {
+                    //
+                    $relationConfig = $relationConfigs[$name]['call'];
+
+                    $name = $relationConfigs[$name]['relation'];
+
+                    if (isset($nameSets[$name])) {
+                        throw new InvalidArgumentException("关联配置引用重复: {$name}");
+                    } else {
+                        $nameSets[$name] = true;
+                    }
                 }
             } else {
-                throw new InvalidArgumentException('关联参数只支持布尔类型和数组类型:' . gettype($relationParam));
+                throw new InvalidArgumentException("关联配置结构错误: {$name}");
+            }
+
+            if (is_bool($relationParam) && $relationParam && $relationConfig instanceof \Closure) {
+                //
+                $filterConfigs[$name] = $relationConfig([]);
+                //
+            } else if (is_array($relationParam) && !empty($relationParam) && $relationConfig instanceof \Closure) {
+                //
+                $filterConfigs[$name] = $relationConfig($relationParam);
+                //
+            } else {
+                throw new InvalidArgumentException('关联参数类型或配置错误:' . gettype($relationParam));
             }
         }
 
