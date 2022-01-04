@@ -84,26 +84,24 @@ trait ResolverTrait
 
     /**
      * @desc 排序配置
-     * @param string $orderTable 表名
      * @return \string[][]
      */
-    abstract public function orderConfig(string $orderTable = '') : array;
+    abstract public function orderConfig() : array;
 
     /**
      * @desc 排序解析器
      * @param Builder $query 查询构造器
      * @param string $orderKey 选择排序的键
-     * @param string $orderTable 表名
      * @return Builder
      */
-    public function orderResolver(Builder $query, string $orderKey = '', string $orderTable = '') : Builder
+    public function orderResolver(Builder $query, string $orderKey = '') : Builder
     {
-        $oc = $this->orderConfig($orderTable);
+        $oc = $this->orderConfig();
 
         if (isset($oc[$orderKey])) {
             $conf = $oc[$orderKey];
 
-            if (empty($orderTable)) {
+            if (empty($conf['orderTable'])) {
                 $query->orderBy($conf['key'], $conf['value']);
             } else {
                 $query->orderBy($conf['orderTable'] . '.' . $conf['key'], $conf['value']);

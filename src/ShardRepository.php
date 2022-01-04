@@ -114,7 +114,7 @@ abstract class ShardRepository implements ModelContract, RepositoryContract, Bat
 
         // 关联排序解析器
         if ( !empty($orderConfig)) {
-            $query = $this->orderResolver($query, $orderConfig['orderKey'], $orderConfig['orderTable'] ?? '');
+            $query = $this->orderResolver($query, $orderConfig['orderKey']);
         }
 
         // 排序和分页
