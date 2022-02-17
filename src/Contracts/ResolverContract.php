@@ -53,8 +53,7 @@ interface ResolverContract
      * @desc 排序解析器
      * @param Builder $query 查询构造器
      * @param string $orderKey 选择排序的键
-     * @param string $orderTable 表名
      * @return Builder
      */
-    public function orderResolver(Builder $query, string $orderKey = '', string $orderTable = '') : Builder;
+    public function orderResolver(Builder $query, string $orderKey = '') : Builder;
 }
