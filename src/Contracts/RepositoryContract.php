@@ -42,4 +42,14 @@ interface RepositoryContract
      * @return mixed
      */
     public function info(int $id, array $fields = ['id'], array $relations = ['with_' => true], Closure $before = null);
+
+    /**
+     * @desc 多个
+     * @param array $ids
+     * @param array $fields
+     * @param array $relations
+     * @param \Closure|null $before
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function many(array $ids, array $fields = ['id'], array $relations = [], Closure $before = null);
 }

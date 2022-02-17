@@ -400,4 +400,29 @@ abstract class ShardRepository implements ModelContract, RepositoryContract, Bat
             throw $e;
         }
     }
+
+    /**
+     * @desc
+     * @param array $ids
+     * @param array $fields
+     * @param array $relations
+     * @param \Closure|null $before
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function many(array $ids, array $fields = ['id'], array $relations = [], \Closure $before = null)
+    {
+        $query = $this->getModel()->sharding()->newQuery();
+
+        if ( !is_null($before)) {
+            $before($query);
+        }
+
+        if ( !empty($relations)) {
+            $query = $this->relationResolver($query, $relations);
+        }
+
+        $rows = $query->select($fields)->whereIn($this->getModel()->getKeyName(), $ids)->get();
+
+        return $rows;
+    }
 }
