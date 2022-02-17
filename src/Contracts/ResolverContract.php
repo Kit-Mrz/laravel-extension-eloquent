@@ -44,10 +44,9 @@ interface ResolverContract
      */
     /**
      * @desc 排序配置
-     * @param string $orderTable 表名
      * @return array
      */
-    public function orderConfig(string $orderTable = '') : array;
+    public function orderConfig() : array;
 
     /**
      * @desc 排序解析器
