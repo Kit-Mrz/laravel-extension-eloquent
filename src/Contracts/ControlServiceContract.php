@@ -42,4 +42,14 @@ interface ControlServiceContract
      * @return mixed
      */
     public function destroy(int $id);
+
+    /**
+     * @desc
+     * @param array $ids
+     * @param array $fields
+     * @param array $relations
+     * @param \Closure|null $before
+     * @return mixed
+     */
+    //public function many(array $ids, array $fields = ['id'], array $relations = [], \Closure $before = null);
 }
