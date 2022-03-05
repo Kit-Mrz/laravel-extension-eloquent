@@ -85,19 +85,20 @@ abstract class ShardModel extends EloquentModel implements ShardingContract, Sha
      * @desc 匹配分区因子
      * @return int
      */
-    /*
     public function getMatchFactor() : int
     {
-        $factor = 0;
+        $factor = -1;
 
-        if (preg_match('/_(\d+)$/', $this->getTable(), $matches)) {
-            if (isset($matches[1])) {
-                $factor = (int) $matches[1];
-                $factor = $factor - 1;
+        if ($this->getShardCount() > 0) {
+            if (preg_match('/_(\d+)$/', $this->getTable(), $matches)) {
+                if (isset($matches[1])) {
+                    $factor = (int) $matches[1];
+                    $factor = $factor - 1;
+                }
             }
         }
 
         return $factor;
     }
-    */
+
 }
