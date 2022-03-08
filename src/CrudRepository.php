@@ -92,7 +92,7 @@ abstract class CrudRepository implements ModelContract, RepositoryContract, Batc
 
         // 关联排序解析器
         if ( !empty($orderConfig)) {
-            $query = $this->orderResolver($query, $orderConfig['orderKey']);
+            $query = $this->orderResolver($query, $orderConfig['orderKey'] ?? "", $orderConfig['orderTable'] ?? "");
         }
 
         // 排序和分页
