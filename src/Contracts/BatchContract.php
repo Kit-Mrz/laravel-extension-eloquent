@@ -26,4 +26,12 @@ interface BatchContract
      * @return array
      */
     public function safeBatchUpdate(array $data, Closure $custom = null) : array;
+
+    /**
+     * @desc 批量删除
+     * @param array $ids
+     * @param Closure|null $before
+     * @return int
+     */
+    public function batchDestroy(array $ids, \Closure $before = null) : int;
 }

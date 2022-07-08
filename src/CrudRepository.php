@@ -394,4 +394,22 @@ abstract class CrudRepository implements ModelContract, RepositoryContract, Batc
 
         return $rows;
     }
+
+    /**
+     * @desc
+     * @param array $id
+     * @return int
+     */
+    public function batchDestroy(array $ids, \Closure $before = null) : int
+    {
+        $query = $this->getModel()->newQuery();
+
+        if ( !is_null($before)) {
+            $before($query);
+        }
+
+        $num = $query->whereIn($this->getModel()->getKeyName(), $ids)->delete();
+
+        return $num;
+    }
 }

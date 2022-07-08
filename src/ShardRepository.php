@@ -425,4 +425,22 @@ abstract class ShardRepository implements ModelContract, RepositoryContract, Bat
 
         return $rows;
     }
+
+    /**
+     * @desc
+     * @param array $id
+     * @return int
+     */
+    public function batchDestroy(array $ids, \Closure $before = null) : int
+    {
+        $query = $this->getModel()->sharding()->newQuery();
+
+        if ( !is_null($before)) {
+            $before($query);
+        }
+
+        $num = $query->whereIn($this->getModel()->getKeyName(), $ids)->delete();
+
+        return $num;
+    }
 }
