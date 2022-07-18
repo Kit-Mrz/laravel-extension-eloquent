@@ -42,6 +42,8 @@ abstract class ShardRepository implements ModelContract, RepositoryContract, Bat
      */
     public function getModel()
     {
+        $this->_model->sharding();
+
         return $this->_model;
     }
 
